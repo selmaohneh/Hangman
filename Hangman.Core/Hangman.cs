@@ -12,18 +12,31 @@ namespace Hangman.Core
             _searchedWord = searchedWord;
         }
 
+        public bool GameFinished { get; private set; }
+        public int NumberOfGuesses { get; private set; }
+
         public string GuessLetter(char guessedLetter)
         {
+            if (!GameFinished)
+            {
+                NumberOfGuesses++;
+            }
+
             if (GuessIsCorrect(guessedLetter))
             {
                 AddToFoundLetters(guessedLetter);
+            }
+
+            if (AllLettersFound())
+            {
+                GameFinished = true;
             }
 
             var output = GenerateOutput();
 
             return output;
         }
-        
+
         private bool GuessIsCorrect(char guessedLetter)
         {
             return _searchedWord.ContainsLetterAsLowerOrUpper(guessedLetter);
@@ -35,6 +48,19 @@ namespace Hangman.Core
             {
                 _foundLetters.Add(guessedLetter);
             }
+        }
+
+        private bool AllLettersFound()
+        {
+            foreach (var searchedLetter in _searchedWord)
+            {
+                if (!_foundLetters.ContainsLetterAsLowerOrUpper(searchedLetter))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private string GenerateOutput()
